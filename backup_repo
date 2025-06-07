@@ -1,0 +1,58 @@
+backup_folder=~/backup_repos
+backup_hub=https://github.com/DouglasWWolf
+
+get_remote()
+{
+    line=$(git remote -v | grep "(fetch)")
+    read _ host _ <<< $line
+    echo $host
+}
+
+# Check to make sure that we're in git repo
+if [ ! -d .git ]; then
+    echo "This isn't a git repo!" 1>&2
+    exit 1
+fi
+
+# Was this repo originally cloned from the backup-hub?
+get_remote | grep -q $backup_hub
+if [ $? -eq 0 ]; then
+    echo "This repo's remote is already the backup hub!" 1>&2
+    exit 1
+fi
+
+# Fetch the name of the folder we are currently in
+source_folder=$PWD
+
+# Fetch the name of the project
+project=$(basename $PWD)
+
+# We keep all of our backups in one folder
+mkdir -p $backup_folder
+cd $backup_folder
+
+# If we don't have a copy of the backup project, fetch it
+if [ ! -d $project/.git ]; then
+    git clone $backup_hub/$project
+    test $? -ne 0 && exit
+fi
+
+# Fetch a copy of the .git folder from the backup project
+cp -r $project/.git ${project}.git
+
+# Wipe out the entire project
+rm -rf $project
+
+# Now copy the source that we're backing up
+cp -r $source_folder $project
+
+# Move the backup-hub's .git folder back into the backup repo
+rm -rf $project/.git
+mv ${project}.git $project/.git
+
+# And push the repo to the backup hub
+cd $project
+git add *
+git commit -m "No commit message"
+git push origin main
+
