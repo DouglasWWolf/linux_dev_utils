@@ -1,0 +1,4 @@
+cp $1 $1.new
+vi $1.new
+cp -p $1.new $1
+rm -rf $1.new

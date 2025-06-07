@@ -1,0 +1,30 @@
+required=linux_dev_utils
+
+get_origin()
+{
+    line=$(git remote -v | grep "(fetch)")
+    read _ host _ <<< $line
+    echo $host
+}
+
+
+
+if [ ! -d .git ]; then
+    echo "Can't do this here" 1>&2
+    exit 1
+fi
+
+# Get the base name of the repo
+repo=$(basename $(get_origin))
+ 
+# If we're in the wrong folder, complain
+if [ $repo != $required ]; then
+    echo "Can't do this here" 1>&2
+    exit 1
+fi
+
+# Push every file in this folder
+git add .
+git commit -m "No change history kept"
+git push origin main
+
