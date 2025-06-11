@@ -21,6 +21,12 @@ if [ $? -eq 0 ]; then
     exit 1
 fi
 
+run_folder=$(ls -d *.runs | grep "\.runs$") 2>/dev/null
+if [ -d $run_folder ]; then
+    echo "$PWD is in a built state!" 1>&2
+    exit 1
+fi 
+
 # Fetch the name of the folder we are currently in
 source_folder=$PWD
 

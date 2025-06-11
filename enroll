@@ -1,0 +1,9 @@
+module=$(find src | grep axi_revision.v)
+cp ~/fpga/u55c_example/src/common/axi_revision.v $module
+cp ~/fpga/u55c_example/src/git_hash.vh      src
+cp ~/fpga/u55c_example/src/timestamp.vh     src
+cp ~/fpga/u55c_example/pre_build.sh         .
+cp ~/fpga/u55c_example/post_build.sh        .
+cp ~/fpga/u55c_example/release_history.txt  .
+
+
