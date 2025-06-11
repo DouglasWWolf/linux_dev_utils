@@ -21,8 +21,15 @@ if [ $? -eq 0 ]; then
     exit 1
 fi
 
-run_folder=$(ls -d *.runs | grep "\.runs$") 2>/dev/null
-if [ -d $run_folder ]; then
+# Do we think there is a "<something>.runs" folder?
+run_folder=$(ls -d *.runs 2>/dev/null)
+
+# Double check to see if this name ends in ".runs"
+test ! -z $run_folder && run_folder=$(echo $run_folder | grep "\.runs$")
+
+# If a "<something>.runs" exists, this project is in a built state!
+if [ ! -z $run_folder ] && [ -d $run_folder ]; then
+    echo "$run_folder"
     echo "$PWD is in a built state!" 1>&2
     exit 1
 fi 
