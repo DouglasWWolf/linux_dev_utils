@@ -1,4 +1,4 @@
-
+clear
 cd ~/fpga/roche
 
 file_list=/tmp/file_list
