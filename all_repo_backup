@@ -1,0 +1,15 @@
+
+cd ~/fpga/roche
+
+file_list=/tmp/file_list
+
+ls -1 >$file_list
+
+while IFS= read dir; do
+    echo ">>>>>>>>>>>>>>>>>>>>  $dir  <<<<<<<<<<<<<<<<<<<<"
+    cd $dir
+    backup_repo
+    cd -
+done <$file_list
+
+rm -rf $file_list

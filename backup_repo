@@ -65,7 +65,4 @@ mv ${project}.git $project/.git
 
 # And push the repo to the backup hub
 cd $project
-git add *
-git commit -m "No commit message"
-git push origin main
-
+push
