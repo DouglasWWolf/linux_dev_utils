@@ -6,12 +6,14 @@ file_list=/tmp/file_list
 ls -1 >$file_list
 
 while IFS= read dir; do
-    echo ">>>>>>>>>>>>>>>>>>>> ========================================="
-    echo ">>>>>>>>>>>>>>>>>>>>  $dir"
-    echo ">>>>>>>>>>>>>>>>>>>> ========================================="
-    cd $dir
-    backup_repo
-    cd - >/dev/null
+    if [ -d $dir ]; then
+        echo ">>>>>>>>>>>>>>>>>>>> ========================================="
+        echo ">>>>>>>>>>>>>>>>>>>>  $dir"
+        echo ">>>>>>>>>>>>>>>>>>>> ========================================="
+        cd $dir
+        backup_repo
+        cd - >/dev/null
+    fi
 done <$file_list
 
 rm -rf $file_list
