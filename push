@@ -1,1 +1,14 @@
+# Is there a Xilinx Vivado Project file in this folder?
+xpr_file=$(ls -1 *.xpr 2>/dev/null)
+
+# If there is, we need to find out if it's in a built state
+if [ ! -z $xpr_file ]; then
+    ls -1 | grep -q "\.runs$" 
+    if [ $? -eq 0 ]; then
+        echo "This project is in a built state.  No pushed!" 1>&2
+        exit 1
+    fi
+fi
+
+# If we get here, its safe to push the projects
 ./push
