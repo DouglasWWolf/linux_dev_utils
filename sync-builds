@@ -1,0 +1,5 @@
+source ~/git-relay.conf
+
+sshpass -p $git_relay_pw rsync -az ${git_relay_user}:/Users/wolfd16/vivado_builds ~
+
+
