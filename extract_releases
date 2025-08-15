@@ -1,0 +1,23 @@
+src=~/vivado_builds
+
+# The current directory needs to be empty!
+if [ "$(ls)" != "" ]; then
+    echo "Current directory is not empty!" 1>&2
+    exit 1
+fi
+
+# Copy all of the build-artifact directories to here
+cp -r $src/* .
+
+# Loop through each source directory...
+for dir in $(ls); do
+
+    # Remove the Vivado build folders
+    rm -rf $dir/20*
+    
+    # Move all folders in $/dir/releases up one level
+    mv  $dir/releases/* $dir
+    
+    # Get rid of the now empty "releases" folder
+    rm -rf $dir/releases
+done
