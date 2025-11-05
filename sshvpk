@@ -1,6 +1,0 @@
-ip=12.12.12.12
-ssh petalinux@$ip
-if [ $? -ne 0 ]; then
-  ssh-keygen -f ~/.ssh/known_hosts -R $ip
-  ssh petalinux@$ip
-fi
