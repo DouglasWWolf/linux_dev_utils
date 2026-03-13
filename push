@@ -1,3 +1,10 @@
+ping -c1 google.com >/dev/null 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "Not connected to the internet!"
+    exit 1
+fi
+
+
 # Is there a Xilinx Vivado Project file in this folder?
 xpr_file=$(ls -1 *.xpr 2>/dev/null)
 

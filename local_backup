@@ -1,0 +1,18 @@
+ip=192.168.1.53 
+host=wolf@$ip
+remote_root=/home/wolf/local_backups
+folder_name=$(basename $PWD)
+prior=$remote_root/${folder_name}.prior
+foo=narnia
+
+result=$(ping -c1 $ip)
+echo $result | grep "1 received" >/dev/null 
+if [ $? -ne 0 ]; then
+    echo "$ip is not up or connected!"
+    exit 1
+fi
+
+sshpass -p $foo ssh $host rm -rf $prior
+sshpass -p $foo ssh $host mv $remote_root/$folder_name $prior 2>/dev/null
+                scp -r $PWD $host:$remote_root
+exit 0

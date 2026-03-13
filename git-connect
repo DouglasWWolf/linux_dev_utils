@@ -1,0 +1,19 @@
+if [ -z $1 ]; then
+    echo Must specify repo name! 
+    exit 1
+fi  
+
+if [ -d .git ]; then
+    echo This is already a git repo!
+    exit 1
+fi
+
+echo "# $1" > README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/DouglasWWolf/$1.git
+git push -u origin main
+
+
