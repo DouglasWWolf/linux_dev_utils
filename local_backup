@@ -1,4 +1,4 @@
-ip=192.168.1.53 
+ip=192.168.1.51 
 host=wolf@$ip
 remote_root=/home/wolf/local_backups
 folder_name=$(basename $PWD)
