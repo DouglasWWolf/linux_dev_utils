@@ -48,6 +48,12 @@ if [[ ! -d $reflected_dir/$dst_repo_name/.git ]]; then
     git clone $dst_account/$dst_repo_name $reflected_dir/$dst_repo_name || exit 1
 fi
 
+# Check to see if the repos are identical
+diff $src_repo_name $reflected_dir/$dst_repo_name >/dev/null
+if [ $? -eq 0 ]; then
+   exit 0
+fi
+
 # Extract the .git repo information from the reflected repo
 mv $reflected_dir/$dst_repo_name/.git ./reflected.git
 
@@ -77,11 +83,29 @@ echo Pushing to branch $branch
 
 git switch -c $branch
 git push -u origin HEAD
-echo "<<< Press enter to delete branch >>>"
-read
 
+printf "\n"
+echo "Merging $branch"
+gh pr create --fill --base main
+gh pr merge --rebase --delete-branch
+
+
+printf "\n"
+echo "Syncing $PWD"
 git switch main
-git branch -D $branch
-git push origin --delete $branch
-git pull
+git fetch origin
+git reset --hard origin/main
+git clean -fd
+git fetch --prune
 
+git branch | grep $branch >/dev/null
+if [ $? -eq 0 ]; then
+    echo ">>> Deleting local branch $branch"
+    git branch -D $branch >/dev/null
+fi
+
+git branch -r | grep $branch >/dev/null
+if [ $? -eq 0 ]; then
+    echo ">>> Deleting remote branch $branch"
+    git push origin --delete $branch >/dev/null
+fi
