@@ -1,0 +1,87 @@
+convert_underscores_to_dashes=1
+src_account="https://github.com/DouglasWWolf"
+dst_account="https://github.com/roche-innersource"
+#dst_account="https://code.roche.com/rsc-rtl"
+dst_prefix="rsc-rtl-"
+
+# Ensure that the user gave us a repo name on the command line
+if [[ -z $1 ]]; then
+    echo "Need a repo/directory name on the command line"
+    exit 1
+fi
+
+# The first parameter is the name of repo we're interested in
+src_repo_name=$1
+dst_repo_name=${dst_prefix}${src_repo_name}
+
+# Do we need to convert underscores to dashes?
+if [ $convert_underscores_to_dashes -eq 1 ]; then
+    dst_repo_name=$(echo $dst_repo_name | sed 's/_/-/g')
+fi
+
+# Ensure we can push big files
+git config --global http.postBuffer 157286400
+
+# This is the name of the directory that holds all of the reflected repos
+reflected_dir=roche
+
+# This shouldn't exist, so for safety's sake, get rid of it if it does
+rm -rf reflected.git
+
+# Ensure that the reflected directory exists
+if [[ ! -d $reflected_dir ]]; then
+    echo "Reflected directory $reflected_dir doesn't exist!  Stopping."
+    exit 1
+fi
+
+# Either pull or clone the repo from GitHub.com
+if [[ -d $src_repo_name/.git ]]; then
+    git -C $src_repo_name pull || exit 1
+else
+    rm -rf $src_repo_name
+    git clone $src_account/$src_repo_name || exit 1
+fi
+
+# Ensure that we have a cloned copy of the reflected repo
+if [[ ! -d $reflected_dir/$dst_repo_name/.git ]]; then
+    rm -rf $reflected_dir/$dst_repo_name
+    git clone $dst_account/$dst_repo_name $reflected_dir/$dst_repo_name || exit 1
+fi
+
+# Extract the .git repo information from the reflected repo
+mv $reflected_dir/$dst_repo_name/.git ./reflected.git
+
+# Get rid of any existing files in local copy of the reflected repo
+rm -rf $reflected_dir/$dst_repo_name
+
+# Copy the recently cloned source repo into the reflected folder
+cp -r $src_repo_name $reflected_dir/$dst_repo_name
+
+# The .git folder in the reflected repo contains info
+# from the src account.  Get rid of it
+rm -rf $reflected_dir/$dst_repo_name/.git
+
+# Move the correct .git info to the local copy of the reflected repo
+mv reflected.git $reflected_dir/$dst_repo_name/.git
+
+# And push everything to the remote reflected repo
+cd $reflected_dir/$dst_repo_name
+rm -rf .DS_Store
+git rm --cached .DS_Store >/dev/null 2>/dev/null
+git add .
+git commit -m "Change history kept in file"
+#git push origin main
+
+branch=ship-$(date +%Y%m%d-%H%M%S)
+echo Pushing to branch $branch
+
+git switch -c $branch
+git push -u origin HEAD
+echo "<<< Press enter to delete branch >>>"
+read
+
+git switch main
+git branch -D $branch
+git push origin --delete $branch
+git pull
+
